@@ -35,7 +35,9 @@ server.head('/hello/:name', respond);
 
 server.listen(config.port, () => {
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.db.uri);
+    let dbname='library-dbs';
+    let password = 'Zn95dEE6zh49Sn4anaZzsjkAF2If6KiSLX49gqauRuTTBgFPftroRVCxrPm5V9ae8tLqxnN9uAZaiwWMxCIv8A==';
+    mongoose.connect(config.db.uri,config.db.options);
 
     const db = mongoose.connection;
 
