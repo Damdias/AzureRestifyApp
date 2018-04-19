@@ -2,6 +2,7 @@ let restify = require('restify');
 let bunyan = require("bunyan");
 let config = require("./config");
 let mongoose = require("mongoose");
+let restifyPlugins = require('restify-plugins');
 let Book = require("./Models/BookModel");
 
 let respond = (req, res, next) => {
@@ -14,6 +15,8 @@ const server = restify.createServer({
         name: 'myapp'
     })
 });
+server.use(restifyPlugins.jsonBodyParser({ mapParams: true }));
+server.use(restifyPlugins.acceptParser(server.acceptable));
 server.get('/:name', respond);
 server.get('/books', (req, res, next) => {
     let book = new Book({
@@ -29,15 +32,36 @@ server.get('/books', (req, res, next) => {
         catch((e) => {
             res.send({ msg: 'error occur', err: e });
             next();
-        })
+        });
+});
+server.post('/books', (req, res, next) => {
+    let book = new Book(req.body);
+    book.save().then((books) => {
+        res.send(books);
+        next();
+    }).
+        catch((e) => {
+            res.send({ msg: 'error occur', err: e });
+            next();
+        });
+});
+server.get('/allbooks', (req, res, next) => {
+
+    Book.find({}).then((books) => {
+        res.send(books);
+        next();
+    }).
+        catch((e) => {
+            res.send({ msg: 'error occur', err: e });
+            next();
+        });
 });
 server.head('/hello/:name', respond);
 
 server.listen(config.port, () => {
     mongoose.Promise = global.Promise;
-    let dbname='library-dbs';
-    let password = 'Zn95dEE6zh49Sn4anaZzsjkAF2If6KiSLX49gqauRuTTBgFPftroRVCxrPm5V9ae8tLqxnN9uAZaiwWMxCIv8A==';
-    mongoose.connect(config.db.uri,config.db.options);
+
+    mongoose.connect(config.db.uri, config.db.options);
 
     const db = mongoose.connection;
 
