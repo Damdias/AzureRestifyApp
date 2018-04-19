@@ -3,7 +3,7 @@ let bunyan = require("bunyan");
 let config = require("./config");
 
 let respond = (req,res,next)=>{
-    res.send('hello '+req.params.name);
+    res.send(  {msg: 'hello '+req.params.name,title:process.env.TITLE||'default'});
     next();
 }
 
